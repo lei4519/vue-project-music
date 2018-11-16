@@ -35,15 +35,17 @@ export function touch(el, cb) {
     endX: 0
   }
   el.addEventListener('touchstart', (event) => {
-    // event.stopPropagation()
+    event.stopPropagation()
     e.startX = event.changedTouches[0].clientX
     e.startY = event.changedTouches[0].clientY
+    return false
   })
   el.addEventListener('touchend', (event) => {
-    // event.stopPropagation()
+    event.stopPropagation()
     e.$event = event
     e.endX = event.changedTouches[0].clientX
     e.endY = event.changedTouches[0].clientY
     cb && cb(e)
+    return false
   })
 }

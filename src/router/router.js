@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Recommend from '@/views/recommend/recommend.vue'
-import Singer from '@/views/singer/singer.vue'
-import Rank from '@/views/rank/rank.vue'
+
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -18,11 +17,15 @@ export default new Router({
     },
     {
       path: '/singer',
-      component: Singer
+      component: () => import('@/views/singer/singer.vue')
     },
     {
       path: '/rank',
-      component: Rank
+      component: () => import('@/views/rank/rank.vue')
+    },
+    {
+      path: '/search',
+      component: () => import('@/views/search/search.vue')
     }
 	]
 })

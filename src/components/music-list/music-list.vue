@@ -54,7 +54,7 @@ export default {
 	mounted() {
 		this.coverHeight = this.$refs.cover.clientHeight
 		touch(this.$refs.musicList, e => {
-			let width = e.el.clientWidth / 3
+			let width = e.el.clientWidth / 4
 			if (Math.abs(e.startX - e.endX) < width) {
 				return
 			}
