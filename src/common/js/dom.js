@@ -1,3 +1,5 @@
+import { resolve } from "path";
+
 export function addClass(el, className) {
   if (hasClass(el, className)) {
     return false
@@ -21,4 +23,27 @@ export function getData(el, name, val) {
   } else {
     return el.getAttribute(name)
   }
+}
+
+export function touch(el, cb) {
+  let e = {
+    $event: {},
+    el,
+    startY: 0,
+    endY: 0,
+    startX: 0,
+    endX: 0
+  }
+  el.addEventListener('touchstart', (event) => {
+    // event.stopPropagation()
+    e.startX = event.changedTouches[0].clientX
+    e.startY = event.changedTouches[0].clientY
+  })
+  el.addEventListener('touchend', (event) => {
+    // event.stopPropagation()
+    e.$event = event
+    e.endX = event.changedTouches[0].clientX
+    e.endY = event.changedTouches[0].clientY
+    cb && cb(e)
+  })
 }

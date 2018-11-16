@@ -86,11 +86,18 @@
         this.logo = imgurl
         const {data: res} = await getCDInfo(dissid)
         if (res.code === ERR_OK) {
-          this.cdInfoData = res.cdlist[0]
+          this.cdInfoData = this.normalizeMusicData(res.cdlist[0])
+        }
+      },
+      normalizeMusicData(cdInfo) {
+        return {
+            dissname: cdInfo.dissname,
+            songlist: cdInfo.songlist
         }
       },
       close() {
         this.isShow = false
+        this.cdInfoData = {}
       }
     },
     created() {
