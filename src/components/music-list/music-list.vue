@@ -54,14 +54,14 @@ export default {
 	mounted() {
 		this.coverHeight = this.$refs.cover.clientHeight
 		touch(this.$refs.musicList, e => {
-			let width = e.el.clientWidth / 4
+			let width = e.el.clientWidth / 3		
 			if (Math.abs(e.startX - e.endX) < width) {
 				return
 			}
 			if (e.startX - e.endX < 0) {
 				this.$emit('close')
 			}
-		})
+		}, true)
 	},
 	props: {
 		data: {

@@ -15,41 +15,48 @@
   import Tab from '@/views/tab/tab.vue'
   import {touch} from '@/common/js/dom.js'
 
-
+  const ROUTE_LENGTH = 4
   export default {
     created() {
-      this.searchRoute = /\/(\w+)|\//
+      this.isTouch = false
+      this.routeId = {
+          '/recommend': 1,
+          '/singer': 2,
+          '/rank': 3,
+          '/search': 4
+        }
     },
     data() {
       return {
-        transitionName: 'toRight',
-        routeId: {
-          'recommend': 1,
-          'singer': 2,
-          'rank': 3,
-          'search': 4
-        },
-        routeList: this.$router.options.routes
+        transitionName: 'toRight'
       }
     },
     mounted() {
       touch(this.$refs.app, e => {
-        let width = e.el.offsetWidth / 4
+        let width = e.el.offsetWidth / 3
         if (Math.abs(e.startX - e.endX) < width) return
-        this.transitionName = e.startX - e.endX > 0 ?  'toLeft' : 'toRight'
-        let route = this.searchRoute.exec(this.$route.path)[1]
-        let i = this.transitionName === 'toRight' ? this.routeId[route] - 1 : this.routeId[route] + 1
-        i = i === 0 ? this.routeList.length - 1 : i > this.routeList.length - 1 ? 1 : i
-        this.$router.push(this.routeList[i])
+        this.isTouch = true
+        let direction = e.startX - e.endX > 0 ?  1 : -1
+        let i = this.routeId[this.$route.path] + direction
+        i = (i < 1) ? ROUTE_LENGTH : (i > ROUTE_LENGTH) ? 1 : i
+        for (const route of Object.keys(this.routeId)) {
+          if (i === this.routeId[route]) {
+            this.$router.push(route)
+            return
+          }
+        }
       })
     },
     watch: {
       $route(to, from) {
-        let toPath = this.searchRoute.exec(to.path)[1]
-        let fromPath = this.searchRoute.exec(from.path)[1]
-        if (!toPath || !fromPath) return
-        let direction = this.routeId[toPath] - this.routeId[fromPath]
-        this.transitionName = (direction >= 1 && direction <= 2 || direction === -3) ? 'toLeft' : 'toRight'
+        if (!to.path || !from.path || from.path === '/') return
+        let direction = this.routeId[to.path] - this.routeId[from.path]
+        if (this.isTouch) {
+          this.isTouch = false
+          this.transitionName = (direction === 1 || direction === -3) ? 'toLeft' : 'toRight'
+        } else {
+          this.transitionName = direction < 0 ? 'toRight' : 'toLeft'
+        }
       }
     },
     components: {

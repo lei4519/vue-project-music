@@ -25,23 +25,24 @@ export function getData(el, name, val) {
   }
 }
 
-export function touch(el, cb) {
+export function touch(el, cb, stop = false) {
   let e = {
     $event: {},
     el,
     startY: 0,
     endY: 0,
     startX: 0,
-    endX: 0
+    endX: 0,
+    stop
   }
   el.addEventListener('touchstart', (event) => {
-    event.stopPropagation()
+    e.stop && event.stopPropagation()
     e.startX = event.changedTouches[0].clientX
     e.startY = event.changedTouches[0].clientY
     return false
   })
   el.addEventListener('touchend', (event) => {
-    event.stopPropagation()
+    e.stop && event.stopPropagation()
     e.$event = event
     e.endX = event.changedTouches[0].clientX
     e.endY = event.changedTouches[0].clientY

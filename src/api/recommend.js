@@ -1,7 +1,6 @@
 import jsonp from '@/common/js/jsonp'
 import {commonParams, options} from './config'
 import axios from 'axios'
-import {param} from '@/common/js/jsonp'
 
 export function getRecommend() {
   const url =
