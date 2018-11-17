@@ -7,12 +7,14 @@
                 <router-view></router-view>
             </keep-alive>
         </transition>
+        <play></play>
     </div>
 </template>
 
 <script>
   import MHeader from '@/views/m-header/m-header.vue'
   import Tab from '@/views/tab/tab.vue'
+  import Play from '@/views/play/play.vue'
   import {touch} from '@/common/js/dom.js'
 
   const ROUTE_LENGTH = 4
@@ -61,7 +63,8 @@
     },
     components: {
       MHeader,
-      Tab
+      Tab,
+      Play
     }
   }
 </script>
