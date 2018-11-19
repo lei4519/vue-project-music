@@ -35,6 +35,8 @@
     },
     mounted() {
       touch(this.$refs.app, e => {
+        let flag = e.$event.path.some(el => (el.className === 'slider' || el.className === 'play'))
+        if (flag) return
         let width = e.el.offsetWidth / 3
         if (Math.abs(e.startX - e.endX) < width) return
         this.isTouch = true
