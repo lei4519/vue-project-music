@@ -1,5 +1,5 @@
 <template>
-    <div class="app" ref="app">
+    <div class="app" ref="app" @touchmove.prevent>
         <m-header></m-header>
         <tab></tab>
         <transition :name="transitionName">
