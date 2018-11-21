@@ -1,57 +1,84 @@
 <template>
-    <transition name="list-fade">
-        <div class="play-list">
-            <div class="list-wrapper">
-                <div class="list-header">
-                    <h1 class="title">
-                        <i class="icon icon-sequence"></i>
-                        <span class="text">顺序播放</span>
-                        <span class="clear">
-                            <i class="icon-clear"></i>
-                        </span>
-                    </h1>
-                </div>
-                <scroll class="list-content">
-                    <transition-group name="list" tag="ul">
-                        <li class="item" style="pointer-events: auto;">
-                            <i class="current"></i>
-                            <span class="text">寄我此生</span>
-                            <span class="like">
-                                <i class="icon-not-favorite"></i>
-                            </span>
-                            <span class="delete">
-                                <i class="icon-delete"></i>
-                            </span>
-                        </li>
-                    </transition-group>
-                </scroll>
-                <div class="list-operate">
-                    <div class="add">
-                        <i class="icon-add"></i>
-                        <div class="text">添加歌曲到队列</div>
-                    </div>
-                </div>
-                <div class="list-close">
-                    <span>关闭</span>
-                </div>
-            </div>
-            <confirm />
-        </div>
-    </transition>
+	<transition name="list-fade">
+		<div class="play-list">
+			<div class="list-wrapper">
+				<div class="list-header">
+					<h1 class="title">
+						<i class="icon icon-sequence"></i>
+						<span class="text">顺序播放</span>
+						<span class="clear">
+							<i class="icon-clear"></i>
+						</span>
+					</h1>
+				</div>
+				<scroll class="list-content">
+					<transition-group name="list" tag="ul">
+						<li class="item" style="pointer-events: auto;">
+							<i class="current"></i>
+							<span class="text">寄我此生</span>
+							<span class="like">
+								<i class="icon-not-favorite"></i>
+							</span>
+							<span class="delete">
+								<i class="icon-delete"></i>
+							</span>
+						</li>
+					</transition-group>
+				</scroll>
+				<div class="list-operate">
+					<div class="add">
+						<i class="icon-add"></i>
+						<div class="text">添加歌曲到队列</div>
+					</div>
+				</div>
+				<div class="list-close">
+					<span>关闭</span>
+				</div>
+			</div>
+			<confirm/>
+			<add-song />
+		</div>
+	</transition>
 </template>
 
 <script>
 import confirm from '@/base/confirm/confirm.vue'
+import addSong from '@/components/add-song/add-song.vue'
+
 export default {
 	components: {
-		confirm
+		confirm,
+		addSong
 	}
 }
 </script>
 
 <style lang="scss" scoped>
 @import '@/common/scss/variable.scss';
+@import '@/common/scss/mixin.scss';
+.list-fade-enter-active,
+.list-fade-leave-active {
+	transition: opacity 0.3s;
+	.list-wrapper {
+		transition: all 0.3s;
+	}
+}
 
+.list-fade-enter,
+.list-fade-leave-to {
+	opacity: 0;
+	.list-wrapper {
+		transform: translate3d(0, 100%, 0);
+	}
+}
+.list-enter-active,
+.list-leave-active {
+	transition: all 0.1s;
+}
+.list-enter,
+.list-leave-to {
+	height: 0;
+}
 .play-list {
 	position: fixed;
 	left: 0;
@@ -82,15 +109,7 @@ export default {
 					color: $color-text-l;
 				}
 				.clear {
-					position: relative;
-					&::before {
-						position: absolute;
-						top: -10px;
-						bottom: -10px;
-						left: -10px;
-						right: -10px;
-						content: '';
-					}
+					@include extend-click();
 					.icon-clear {
 						font-size: 14px;
 						color: $color-text-d;
@@ -116,43 +135,28 @@ export default {
 				.text {
 					flex: 1;
 					font-size: 14px;
-					overflow: hidden;
-					text-overflow: ellipsis;
-					white-space: nowrap;
+					@include no-wrap();
 					color: $color-text-d;
 				}
 				.like {
-					position: relative;
 					margin-right: 15px;
 					font-size: 12px;
 					color: #ffcd32;
-					&::before {
-						content: '';
-						position: absolute;
-						top: -10px;
-						left: -10px;
-						right: -10px;
-						bottom: -10px;
+					@include extend-click();
+					.icon-favorite {
+						color: $color-sub-theme;
 					}
 				}
 				.delete {
-					position: relative;
 					font-size: 12px;
 					color: #ffcd32;
-					&::before {
-						content: '';
-						position: absolute;
-						top: -10px;
-						left: -10px;
-						right: -10px;
-						bottom: -10px;
-					}
+					@include extend-click();
 				}
 			}
 		}
 		.list-operate {
 			width: 140px;
-			margin: 20px auto 30px;
+			margin: 20px auto 30px auto;
 			.add {
 				display: flex;
 				align-items: center;
@@ -172,7 +176,7 @@ export default {
 		.list-close {
 			line-height: 50px;
 			text-align: center;
-			font-size: 16px;
+			font-size: $font-size-medium-x;
 			background-color: $color-background;
 			color: $color-text-l;
 		}
