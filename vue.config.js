@@ -46,6 +46,16 @@ module.exports = {
             console.log(e)
           })
         })
+        .get('/getPlayUrl', (req, res) => {
+          const url = 'https://u.y.qq.com/cgi-bin/musicu.fcg'
+          axios.get(url, {
+            params: req.query
+          }).then((response) => {
+            res.json(response.data)
+          }).catch((e) => {
+            console.log(e)
+          })
+        })
     }
   }
 }

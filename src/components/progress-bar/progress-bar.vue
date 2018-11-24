@@ -9,7 +9,7 @@
   </div>
 </template>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 .progress-bar-wrapper{
     height: 30px;
     .bar-inner{

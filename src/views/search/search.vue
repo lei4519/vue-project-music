@@ -1,10 +1,6 @@
 <template>
     <div class="search-wrapper">
-        <div class="search-box">
-            <i class="icon-search"></i>
-            <input type="text" placeholder="搜索歌曲、歌手" class="box" v-model="searchVal">
-            <i class="icon-dismiss" v-show="searchVal" @click="searchVal=''"></i>
-        </div>
+        <search-box @query="query"/>
         <div class="shortcut-wrapper" v-show="!searchVal">
             <scroll class="shortcut">
                 <div>
@@ -68,13 +64,13 @@ searchVal
 <script>
 import Loading from '@/base/loading/loading.vue'
 import Scroll from '@/base/scroll/scroll.vue'
+import searchBox from '@/components/search-box/search-box.vue'
 import { getHotKey, getSearchList } from '@/api/search.js'
 import { ERR_OK } from '@/api/config.js'
 export default {
 	data() {
 		return {
 			searchList: [],
-			searchVal: '',
 			hotKey: [],
 			curPage: 0,
 			noResult: false,
@@ -121,10 +117,8 @@ export default {
 			if (tag.tagName === 'SPAN' || tag.tagName === 'LI') {
 				this.searchVal = tag.innerText
 			}
-		}
-	},
-	watch: {
-		searchVal() {
+		},
+		query(val) {
 			this.curPage = 0
 			this.searchList = []
 			this.noResult = false
@@ -134,7 +128,8 @@ export default {
 	},
 	components: {
 		Loading,
-		Scroll
+		Scroll,
+		searchBox
 	}
 }
 </script>
@@ -143,36 +138,6 @@ export default {
 @import '@/common/scss/variable.scss';
 @import '@/common/scss/mixin.scss';
 .search-wrapper {
-	.search-box {
-		box-sizing: border-box;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin: 20px;
-		height: 40px;
-		line-height: 40px;
-		padding: 0 6px;
-		border-radius: 6px;
-		background-color: $color-highlight-background;
-		color: $color-background;
-		.icon-search {
-			font-size: 24px;
-			flex: 0 0 24px;
-		}
-		.icon-dismiss {
-			font-size: 16px;
-			flex: 0 0 16px;
-		}
-		.box {
-			flex: 1;
-			outline: none;
-			color: #fff;
-			margin: 0 5px;
-			font-size: 14px;
-			line-height: 18px;
-			background-color: $color-highlight-background;
-		}
-	}
 	.shortcut-wrapper {
 		position: fixed;
 		top: 178px;

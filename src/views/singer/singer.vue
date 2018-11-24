@@ -1,20 +1,21 @@
 <template>
-  <div class="singer">
-    <listview :data="singerList" @initSingerList="initSingerList"></listview>
-    <loading v-if="!singerList.length"></loading>
-    <transition>
-      <music-list v-if="isShow" :data="singerInfoData" :logo="logo" @close="close"/>
-    </transition>
-  </div>
+    <div class="singer">
+        <listview
+                :data="singerList"
+                @select="selectSinger"/>
+        <loading v-if="!singerList.length"></loading>
+        <router-view></router-view>
+    </div>
 </template>
 
 <script>
-import MusicList from '@/components/music-list/music-list.vue'
+import singerDetail from '@/views/singer-detail/singer-detail.vue'
 import Loading from '@/base/loading/loading.vue'
 import Listview from '@/base/listview/listview.vue'
-import { getSingerList, getSingerInfo } from '@/api/singer.js'
+import { getSingerList } from '@/api/singer.js'
 import { ERR_OK } from '@/api/config.js'
 import Singer from '@/common/js/singer.js'
+import { mapMutations } from 'vuex'
 
 const HOT_SINGER_LEN = 10
 const HOT_TITLE = '热门'
@@ -25,9 +26,7 @@ export default {
 	},
 	data: () => ({
 		singerList: [],
-		isShow: false,
-		singerInfoData: {},
-		logo: ''
+		isShow: false
 	}),
 	methods: {
 		async _getSingerList() {
@@ -81,45 +80,25 @@ export default {
 			ret.sort((a, b) => a.title.charCodeAt(0) - b.title.charCodeAt(0))
 			return hot.concat(ret)
 		},
-		async initSingerList(id, logo) {
-			this.isShow = true
-			this.logo = logo
-			const { data: res } = await getSingerInfo(id)
-			this.singerInfoData = this.normalizeMusicData(res)
-		},
-		normalizeMusicData(cdInfo) {
-			let songlist = []
-			cdInfo.list.forEach(song => {
-				songlist.push(song.musicData)
+		async selectSinger(singer) {
+			this.$router.push({
+				path: `/singer/${singer.id}`
 			})
-			return {
-				dissname: cdInfo.singer_name,
-				songlist
-			}
+			this.setSinger(singer)
 		},
-		close() {
-			this.isShow = false
-			this.singerInfoData = {}
-		}
+		...mapMutations({
+			setSinger: 'SET_SINGER'
+		})
 	},
 	components: {
 		Loading,
 		Listview,
-		MusicList
+		singerDetail
 	}
 }
 </script>
 
 <style lang="scss" scoped>
-.v-enter,
-.v-leave-to {
-	transform: translateX(100%);
-}
-
-.v-enter-active,
-.v-leave-active {
-	transition: all 0.3s;
-}
 .singer {
 	position: fixed;
 	top: 88px;

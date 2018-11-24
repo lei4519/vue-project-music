@@ -17,7 +17,13 @@ export default new Router({
     },
     {
       path: '/singer',
-      component: () => import('@/views/singer/singer.vue')
+      component: () => import('@/views/singer/singer.vue'),
+      children: [
+        {
+          path: ':id',
+          component: () => import('@/views/singer-detail/singer-detail.vue')
+        }
+      ]
     },
     {
       path: '/rank',

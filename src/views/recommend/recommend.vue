@@ -14,7 +14,8 @@
                 <div class="recommend-list">
                     <h1 class="list-title">热门歌单推荐</h1>
                     <ul>
-                        <li class="item" v-for="item in discList" :key="item.dissid" @click="initMusicList(item.dissid, item.imgurl)">
+                        <li class="item" v-for="item in discList" :key="item.dissid"
+                            @click="selectItem(item)">
                             <div class="icon">
                                 <img v-lazy="item.imgurl" width="60" height="60">
                             </div>
@@ -28,17 +29,11 @@
             </div>
         </scroll>
         <loading v-show="!discList.length"/>
-        <transition>
-            <music-list v-if="isShow"
-                        @close="close"
-                        :data="cdInfoData"
-                        :logo="logo"/>
-        </transition>
     </div>
 </template>
 
 <script>
-  import MusicList from '@/components/music-list/music-list.vue'
+  import singerDetail from '@/views/singer-detail/singer-detail.vue'
   import Slider from '@/base/slider/slider.vue'
   import Scroll from '@/base/scroll/scroll.vue'
   import Loading from '@/base/loading/loading.vue'
@@ -50,15 +45,12 @@
       Slider,
       Scroll,
       Loading,
-      MusicList
+      singerDetail
     },
     data: () => ({
       recommends: [],
       discList: [],
-      isShow: false,
-      dissId: 0,
-      logo: '',
-      cdInfoData: {}
+      dissId: 0
     }),
     methods: {
       async _initDataList() {
@@ -80,24 +72,6 @@
           this.$refs.scroll.refresh()
           this.loadImage.refresh = true
         }
-      },
-      async initMusicList(dissid, imgurl) {
-        this.isShow = true
-        this.logo = imgurl
-        const {data: res} = await getCDInfo(dissid)
-        if (res.code === ERR_OK) {
-          this.cdInfoData = this.normalizeMusicData(res.cdlist[0])
-        }
-      },
-      normalizeMusicData(cdInfo) {
-        return {
-            dissname: cdInfo.dissname,
-            songlist: cdInfo.songlist
-        }
-      },
-      close() {
-        this.isShow = false
-        this.cdInfoData = {}
       }
     },
     created() {
@@ -124,14 +98,17 @@
         width: 100%;
         top: 88px;
         bottom: 0;
+
         .recommend-content {
             height: 100%;
             overflow: hidden;
+
             .slider-wrapper {
                 position: relative;
                 width: 100%;
                 overflow: hidden;
             }
+
             .recommend-list {
                 .list-title {
                     height: 65px;
@@ -141,16 +118,19 @@
                     color: $color-theme;
                 }
             }
+
             .item {
                 display: flex;
                 box-sizing: border-box;
                 align-items: center;
                 padding: 0 20px 20px;
+
                 .icon {
                     flex: 0 0 60px;
                     width: 60px;
                     padding-right: 20px;
                 }
+
                 .text {
                     display: flex;
                     flex-direction: column;
@@ -159,10 +139,12 @@
                     line-height: 20px;
                     overflow: hidden;
                     font-size: $font-size-medium;
+
                     .name {
                         margin-bottom: 10px;
                         color: $color-text;
                     }
+
                     .desc {
                         color: $color-text-d;
                     }

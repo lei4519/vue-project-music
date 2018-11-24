@@ -13,7 +13,7 @@
 				</div>
 				<scroll class="list-content">
 					<transition-group name="list" tag="ul">
-						<li class="item" style="pointer-events: auto;">
+						<li class="item">
 							<i class="current"></i>
 							<span class="text">寄我此生</span>
 							<span class="like">
@@ -36,19 +36,20 @@
 				</div>
 			</div>
 			<confirm/>
-			<add-song />
+			<!--<add-song />-->
 		</div>
 	</transition>
 </template>
 
 <script>
-import confirm from '@/base/confirm/confirm.vue'
-import addSong from '@/components/add-song/add-song.vue'
+  import confirm from '@/base/confirm/confirm.vue'
+  import scroll from '@/base/scroll/scroll.vue'
+// import addSong from '@/components/add-song/add-song.vue'
 
 export default {
 	components: {
 		confirm,
-		addSong
+      scroll
 	}
 }
 </script>

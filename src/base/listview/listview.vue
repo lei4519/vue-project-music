@@ -14,7 +14,7 @@
                     <li class="list-group-item"
                         v-for="(items, index) in item.items"
                         :key="index"
-                        @click="$emit('initSingerList', items.id, items.avatar)">
+                        @click="selectItem(items)">
                         <img v-lazy="items.avatar" width="50" height="50" class="avatar">
                         <span class="name">{{ items.name }}</span>
                     </li>
@@ -67,7 +67,7 @@
       },
       fixedTitle() {
         return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
-      },
+      }
 
     },
     watch: {
@@ -85,6 +85,9 @@
       }
     },
     methods: {
+      selectItem(item) {
+        this.$emit('select', item)
+      },
       onShortcutTouchStart(e) {
         let i = getData(e.target, 'index')
         if (!i) {
@@ -154,8 +157,10 @@
         height: 100%;
         overflow: hidden;
         background-color: $color-background;
+
         .list-group {
             padding-bottom: 20px;
+
             .list-group-title {
                 width: 100%;
                 height: 30px;
@@ -165,15 +170,18 @@
                 color: $color-text-l;
                 background-color: $color-highlight-background;
             }
+
             .list-group-item {
                 display: flex;
                 align-items: center;
                 padding: 20px 0 0 30px;
                 width: 100%;
                 height: 50px;
+
                 .avatar {
                     border-radius: 50%;
                 }
+
                 .name {
                     margin-left: 20px;
                     font-size: $font-size-medium;
@@ -181,6 +189,7 @@
                 }
             }
         }
+
         .list-shortcut {
             position: absolute;
             right: 0;
@@ -194,13 +203,16 @@
             font-size: $font-size-small;
             color: $color-text-l;
             background-color: $color-background-d;
+
             .item {
                 padding: 3px;
+
                 &.active {
                     color: $color-theme;
                 }
             }
         }
+
         .fixed {
             position: absolute;
             top: 0;
