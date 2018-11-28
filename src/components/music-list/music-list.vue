@@ -65,7 +65,7 @@
       this.coverHeight = this.$refs.cover.clientHeight
       this.minTranslateY = -this.coverHeight + RESERVED_HEIGHT
       touch(this.$refs.singerDetail, e => {
-        let width = e.el.clientWidth / 3
+        let width = e.el.clientWidth / 2
         if (Math.abs(e.startX - e.endX) < width) {
           return
         }

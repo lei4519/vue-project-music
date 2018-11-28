@@ -19,6 +19,8 @@ const mutations = {
     state.mode = mode
   },
   [types.SET_CURRENT_INDEX](state, index) {
+	  let len = state.playList.length - 1
+    index = index < 0 ? len : index > len ? 0 : index
     state.currentIndex = index
   }
 }

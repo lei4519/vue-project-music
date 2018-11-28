@@ -1,5 +1,5 @@
 <template>
-    <div class="app" ref="app" @touchmove.prevent>
+    <div class="app" ref="app" @touchmove.prevent @click.once="iosTiggerPlayer">
         <m-header></m-header>
         <tab></tab>
         <transition :name="transitionName">
@@ -53,6 +53,11 @@ export default {
 			}
 		})
 	},
+    methods: {
+      iosTiggerPlayer() {
+        document.querySelector('audio').play()
+      }
+    },
 	watch: {
 		$route(to, from) {
 			if (!to.path || !from.path || from.path === '/') return

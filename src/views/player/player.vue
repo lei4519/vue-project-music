@@ -24,7 +24,7 @@
                      @touchend="touchend">
                     <div class="middle-l" ref="cdWrapper">
                         <div class="cd-wrapper">
-                            <div class="cd">
+                            <div class="cd" :class="rotateCls">
                                 <img class="image"
                                      :src="currentSong.image">
                             </div>
@@ -40,26 +40,30 @@
                 </div>
                 <div class="bottom">
                     <div class="dot-wrapper">
-                        <span class="dot" :class="{'active': currentIndex === 'left'}"></span>
-                        <span class="dot" :class="{'active': currentIndex === 'right'}"></span>
+                        <span class="dot" :class="{'active': pageIndex === 'left'}"></span>
+                        <span class="dot" :class="{'active': pageIndex === 'right'}"></span>
                     </div>
                     <div class="progress-wrapper">
-                        <span class="time time-l">0:00</span>
-                        <progressBar></progressBar>
-                        <span class="time time-r">3:42</span>
+                        <span class="time time-l">{{ currentTime | formatTime }} </span>
+                        <progressBar :currentTime="currentTime"
+                                     :durationTime="durationTime"
+                                     @dragProgress="dragProgress"/>
+                        <span class="time time-r">{{ durationTime | formatTime }} </span>
                     </div>
                     <div class="operators">
                         <div class="icon i-left">
                             <i class="icon-sequence"></i>
                         </div>
-                        <div class="icon i-left">
-                            <i class="icon-prev"></i>
+                        <div class="icon i-left" :class="disableCls">
+                            <i class="icon-prev" @click="prev"></i>
                         </div>
-                        <div class="icon center">
-                            <i class="needsclick icon-play"></i>
+                        <div class="icon center" :class="disableCls">
+                            <i class="needsclick"
+                               :class="playIcon"
+                               @click="togglePlaying"></i>
                         </div>
-                        <div class="icon i-right">
-                            <i class="icon-next"></i>
+                        <div class="icon i-right" :class="disableCls">
+                            <i class="icon-next" @click="next"></i>
                         </div>
                         <div class="icon i-right">
                             <i class="icon icon-not-favorite"></i>
@@ -73,7 +77,8 @@
                 <div class="icon">
                     <img width="40"
                          height="40"
-                         :src="currentSong.image">
+                         :src="currentSong.image"
+                         :class="rotateCls">
                 </div>
                 <div class="text">
                     <h2 class="name" v-html="currentSong.name"></h2>
@@ -81,7 +86,9 @@
                 </div>
                 <div class="control">
                     <progress-circle>
-                        <i class="icon-mini icon-play-mini"></i>
+                        <i class="icon-mini icon-play-mini"
+                           @click.stop="togglePlaying"
+                           :class="`${playIcon}-mini`"></i>
                     </progress-circle>
                 </div>
                 <div class="control">
@@ -89,6 +96,11 @@
                 </div>
             </div>
         </transition>
+        <audio ref="audio"
+               :src="currentSong.url"
+               @canplay="ready"
+               @error="error"
+               @timeupdate="timeupdate"></audio>
     </div>
 </template>
 
@@ -112,14 +124,28 @@
     },
     data() {
       return {
-        currentIndex: 'left'
+        pageIndex: 'left',
+        songReady: false,
+        currentTime: 0,
+        durationTime: 0
       }
     },
     computed: {
+      rotateCls() {
+        return this.playing ? 'play' : 'play pause'
+      },
+      playIcon() {
+        return this.playing ? 'icon-pause' : 'icon-play'
+      },
+      disableCls() {
+        return this.songReady ? '' : 'disable'
+      },
       ...mapGetters([
         'fullScreen',
         'playList',
-        'currentSong'
+        'currentSong',
+        'playing',
+        'currentIndex'
       ])
     },
     methods: {
@@ -129,14 +155,14 @@
       },
       touchmove(e) {
         let currentX = e.changedTouches[0].pageX
-        if (this.startX - currentX > 50 && this.currentIndex === 'left') {
+        if (this.startX - currentX > 50 && this.pageIndex === 'left') {
           this.isTouch = true
           this.lyricWrapper.style.transform = `translateX(-${this.startX -
           currentX}px)`
           this.cdWrapper.style.opacity = `${100 / (this.startX - currentX)}`
         } else if (
           this.startX - currentX < -50 &&
-          this.currentIndex === 'right'
+          this.pageIndex === 'right'
         ) {
           this.isTouch = true
           this.lyricWrapper.style.transform = `translateX(-${this.lyricWrapper
@@ -152,18 +178,18 @@
           let width = this.lyricWrapper.clientWidth
           if (Math.abs(this.startX - endX) > width / 2) {
             this.isTouch = false
-            if (this.currentIndex === 'left') {
-              this.currentIndex = 'right'
+            if (this.pageIndex === 'left') {
+              this.pageIndex = 'right'
               this.lyricWrapper.style.transform = `translateX(-${width}px)`
               this.cdWrapper.style.opacity = '0'
             } else {
-              this.currentIndex = 'left'
+              this.pageIndex = 'left'
               this.lyricWrapper.style.transform = 'none'
               this.cdWrapper.style.opacity = '1'
             }
           } else {
             this.isTouch = false
-            if (this.currentIndex === 'left') {
+            if (this.pageIndex === 'left') {
               this.lyricWrapper.style.transform = 'none'
               this.cdWrapper.style.opacity = '1'
             } else {
@@ -230,15 +256,67 @@
       open() {
         this.setFullScreen(true)
       },
+      prev() {
+        if (!this.songReady) return
+        !this.playing && this.togglePlaying()
+        this.setCurrentIndex(this.currentIndex - 1)
+        this.songReady = false
+      },
+      next() {
+        if (!this.songReady) return
+        !this.playing && this.togglePlaying()
+        this.setCurrentIndex(this.currentIndex + 1)
+        this.songReady = false
+      },
+      ready() {
+        this.songReady = true
+        this.durationTime = this.$refs.audio.duration
+      },
+      error() {
+        this.songReady = true
+      },
+      timeupdate(el) {
+        this.currentTime = this.$refs.audio.currentTime
+      },
+      togglePlaying() {
+        if (!this.songReady) return
+        this.setPlayState(!this.playing)
+      },
+      dragProgress(time) {
+        this.$refs.audio.currentTime = time
+      },
       ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN'
+        setFullScreen: 'SET_FULL_SCREEN',
+        setPlayState: 'SET_PLAYING_STATE',
+        setCurrentIndex: 'SET_CURRENT_INDEX'
       })
+    },
+    watch: {
+      currentSong() {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+      },
+      playing(newPlaying) {
+        const audio = this.$refs.audio
+        this.$nextTick(() => {
+          newPlaying ? audio.play() : audio.pause()
+        })
+      }
     },
     components: {
       playList,
       Scroll,
       progressBar,
       progressCircle
+    },
+    filters: {
+      formatTime(val) {
+        val = +val
+        let m = ((val / 60 | 0) + '').padStart(2, 0)
+        let s = ((val % 60 | 0) + '').padStart(2, 0)
+        return `${m}:${s}`
+      }
     }
   }
 </script>
@@ -466,6 +544,7 @@
 
                 .progress-wrapper {
                     display: flex;
+                    justify-content: center;
                     align-items: center;
                     width: 80%;
                     margin: 0 auto;
@@ -486,6 +565,7 @@
 
                     .progress-bar-wrapper {
                         flex: 1;
+                        margin: 0 5px;
                     }
                 }
 
@@ -585,6 +665,7 @@
             .control {
                 flex: 0 0 30px;
                 width: 30px;
+                height: 30px;
                 padding: 0 10px;
 
                 .icon-play-mini,
