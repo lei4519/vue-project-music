@@ -1,48 +1,51 @@
 <template>
   <transition name="slide">
-    <music-list :title="title" :bgImg="bgImg" :songs="songs"/>
+    <music-list :isRank="isRank" :title="title" :bgImg="bgImg" :songs="songs"/>
   </transition>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import { getSingerDetail, getPlayUrl } from '@/api/singer.js'
+import { getRankInfo } from '@/api/rank.js'
 import { ERR_OK } from '@/api/config.js'
 import { creataSongs } from '@/common/js/song.js'
 import musicList from '@/components/music-list/music-list.vue'
 
 export default {
-  created() {
-    if (!this.singer.id) {
+  async created() {
+    if (!this.rank.id) {
       return this.$router.back()
     }
-    this._getSingerDetail(this.singer.id)
-  },
-  data: () => ({
-    songs: []
-  }),
-  computed: {
-    ...mapGetters(['singer']),
-    title() {
-      return this.singer.name
-    },
-    bgImg() {
-      return this.singer.avatar
-    }
+    this.getRankInfo(this.rank.id)
   },
   methods: {
-    async _getSingerDetail(id) {
-      const res = await getSingerDetail(id)
+    async getRankInfo(id) {
+      let res = await getRankInfo(id)
       if (res.code === ERR_OK) {
-        let arr = res.data.list.map(s => s.musicData)
+        const arr = res.songlist.map(s => s.data)
         this._normalizeSongs(arr)
       }
     },
-    async _normalizeSongs(list) {
+    _normalizeSongs(list) {
       let gen = creataSongs(list)
       this.songs = gen.next().value
       gen.next()
     }
+  },
+  data: () => ({
+    songs: [],
+    isRank: true
+  }),
+  computed: {
+    title() {
+      return this.rank.topTitle
+    },
+    bgImg() {
+      return this.rank.picUrl
+    },
+    ...mapGetters([
+      'rank'
+    ])
   },
   components: {
     musicList

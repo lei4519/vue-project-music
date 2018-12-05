@@ -1,37 +1,49 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Recommend from '@/views/recommend/recommend.vue'
+import Vue from "vue";
+import Router from "vue-router";
+import Recommend from "@/views/recommend/recommend.vue";
 
-Vue.use(Router)
+Vue.use(Router);
 export default new Router({
-	mode: 'history',
-	base: process.env.BASE_URL,
-	routes: [
-		{
-			path: '/',
-			redirect: '/recommend'
-		},
+  mode: "history",
+  base: process.env.BASE_URL,
+  routes: [
     {
-      path: '/recommend',
-      component: Recommend
+      path: "/",
+      redirect: "/recommend"
     },
     {
-      path: '/singer',
-      component: () => import('@/views/singer/singer.vue'),
+      path: "/recommend",
+      component: Recommend,
       children: [
         {
-          path: ':id',
-          component: () => import('@/views/singer-detail/singer-detail.vue')
+          path: ":id",
+          component: () => import("@/views/disc/disc.vue")
         }
       ]
     },
     {
-      path: '/rank',
-      component: () => import('@/views/rank/rank.vue')
+      path: "/singer",
+      component: () => import("@/views/singer/singer.vue"),
+      children: [
+        {
+          path: ":id",
+          component: () => import("@/views/singer-detail/singer-detail.vue")
+        }
+      ]
     },
     {
-      path: '/search',
-      component: () => import('@/views/search/search.vue')
+      path: "/rank",
+      component: () => import("@/views/rank/rank.vue"),
+      children: [
+        {
+          path: ":id",
+          component: () => import("@/views/top-list/top-list.vue")
+        }
+      ]
+    },
+    {
+      path: "/search",
+      component: () => import("@/views/search/search.vue")
     }
-	]
-})
+  ]
+});

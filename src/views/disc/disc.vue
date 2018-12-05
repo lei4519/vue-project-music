@@ -6,43 +6,44 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import { getSingerDetail, getPlayUrl } from '@/api/singer.js'
+import { getDiscInfo } from '@/api/recommend.js'
 import { ERR_OK } from '@/api/config.js'
 import { creataSongs } from '@/common/js/song.js'
 import musicList from '@/components/music-list/music-list.vue'
 
 export default {
-  created() {
-    if (!this.singer.id) {
+  async created() {
+    if (!this.disc.dissid) {
       return this.$router.back()
     }
-    this._getSingerDetail(this.singer.id)
+    this._getDiscInfo(this.disc.dissid)
+  },
+  methods: {
+    async _getDiscInfo(id) {
+      let { data: res } = await getDiscInfo(id)
+      if (res.code === ERR_OK) {
+        this._normalizeSongs(res.cdlist[0].songlist)
+      }
+    },
+    _normalizeSongs(list) {
+      let gen = creataSongs(list)
+      this.songs = gen.next().value
+      gen.next()
+    }
   },
   data: () => ({
     songs: []
   }),
   computed: {
-    ...mapGetters(['singer']),
     title() {
-      return this.singer.name
+      return this.disc.dissname
     },
     bgImg() {
-      return this.singer.avatar
-    }
-  },
-  methods: {
-    async _getSingerDetail(id) {
-      const res = await getSingerDetail(id)
-      if (res.code === ERR_OK) {
-        let arr = res.data.list.map(s => s.musicData)
-        this._normalizeSongs(arr)
-      }
+      return this.disc.imgurl
     },
-    async _normalizeSongs(list) {
-      let gen = creataSongs(list)
-      this.songs = gen.next().value
-      gen.next()
-    }
+    ...mapGetters([
+      'disc'
+    ])
   },
   components: {
     musicList

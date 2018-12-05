@@ -1,12 +1,14 @@
 <template>
     <div class="progress-bar-wrapper">
-        <div class="bar-inner" ref="barInner">
+        <div class="bar-inner"
+             ref="barInner"
+             @click.stop="barClick">
             <div class="progress" ref="progressBg"></div>
-            <div class="progress-btn-wrapper"
-                 @touchstart.stop="touchstart"
-                 @touchmove.stop="touchmove"
-                 @touchend.stop="touchend">
-                <div class="progress-btn" ref="progressBtn"></div>
+            <div class="progress-btn-wrapper" ref="progressBtn"
+                 @touchstart.stop.prevent="progressTouchStart"
+                 @touchmove.stop.prevent="progressTouchMove"
+                 @touchend.stop="progressTouchEnd">
+                <div class="progress-btn"></div>
             </div>
         </div>
     </div>
@@ -16,59 +18,62 @@
   import {prefixStyle} from '@/common/js/dom'
 
   const BTN_WIDTH = 16
+  const sliding = Symbol('sliding')
   const transform = prefixStyle('transform')
   export default {
     created() {
-      this.touchX = 0
-      this.touched = false
+      this.touch = {
+        x: 0,
+        [sliding]: false,
+        bgWidth: 0
+      }
     },
     mounted() {
       this.bg = this.$refs.progressBg
       this.btn = this.$refs.progressBtn
     },
     props: {
-      currentTime: {
-        type: Number,
-        default: 0
-      },
-      durationTime: {
+      percent: {
         type: Number,
         default: 0
       }
     },
     watch: {
-      currentTime() {
-        if (this.touched) return
-        if(!this.barWidth) {
+      percent() {
+        if (this[sliding]) return
+        if (!this.barWidth) {
           this.barWidth = this.$refs.barInner.clientWidth - BTN_WIDTH
         }
-        let percent = this.currentTime / this.durationTime * 100
-        this.bg.style.width = `${percent}%`
-        let width = this.bg.offsetWidth
+        let width = this.barWidth * this.percent
+        this.bg.style.width = `${width}px`
         this.btn.style[transform] = `translate3d(${width}px, 0, 0)`
       }
     },
     methods: {
-      touchstart(e) {
-        this.touched = true
-        this.touchX = e.changedTouches[0].clientX
-        this.bgWidth = this.bg.offsetWidth
+      barClick(e) {
+        let percent = (e.layerX - BTN_WIDTH) / this.barWidth
+        percent = Math.min(1, percent)
+        this.$emit('dragProgress', percent)
       },
-      touchmove(e) {
-        let dragX = e.changedTouches[0].clientX
+      progressTouchStart(e) {
+        this[sliding] = true
+        this.touch.x = e.touches[0].pageX
+        this.touch.bgWidth = this.bg.clientWidth
+      },
+      progressTouchMove(e) {
+        if (!this[sliding]) return
+        let dragX = e.touches[0].pageX
         let barWidth = this.barWidth
-        let width = dragX - this.touchX + this.bgWidth
-        width = width <= 0 ? 0 : width >= barWidth ? barWidth : width
+        let width = dragX - this.touch.x + this.touch.bgWidth
+        width = Math.min(barWidth, Math.max(0, width))
         this.bg.style.width = `${width}px`
         this.btn.style[transform] = `translate3d(${width}px, 0, 0)`
       },
-      touchend(e) {
-        let bgWidth = this.bg.offsetWidth
+      progressTouchEnd(e) {
+        let bgWidth = this.bg.clientWidth
         let percent = bgWidth / this.barWidth
-        let curTime = this.durationTime * percent
-        this.$emit('dragProgress', curTime)
-        this.touched = false
-        this.touchX = 0
+        this.$emit('dragProgress', percent)
+        this[sliding] = false
       }
     }
   }

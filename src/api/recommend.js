@@ -1,39 +1,39 @@
-import jsonp from '@/common/js/jsonp'
-import {commonParams, options} from './config'
-import axios from 'axios'
+import jsonp from "@/common/js/jsonp";
+import { commonParams, options } from "./config";
+import axios from "axios";
 
 export function getRecommend() {
   const url =
-    'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
+    "https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg";
 
   const data = Object.assign({}, commonParams, {
-    platform: 'h5',
+    platform: "h5",
     uin: 0,
     needNewCode: 1
-  })
-  return jsonp(url, data, options)
+  });
+  return jsonp(url, data, options);
 }
 
 export async function getDiscList() {
-  let url = '/getDiscList'
+  let url = "/getDiscList";
   const data = Object.assign({}, commonParams, {
     hostUin: 0,
-    platform: 'yqq',
+    platform: "yqq",
     rnd: Math.random(),
     needNewCode: 0,
     categoryId: 10000000,
     sortId: 5,
     sin: 0,
     ein: 29,
-    format: 'json'
-  })
+    format: "json"
+  });
   return await axios.get(url, {
     params: data
-  })
+  });
 }
 
-export async function getCDInfo(disstid = 0) {
-  let url = '/getCDInfo'
+export async function getDiscInfo(disstid = 0) {
+  let url = "/getDiscInfo";
   const data = Object.assign({}, commonParams, {
     type: 1,
     json: 1,
@@ -43,11 +43,11 @@ export async function getCDInfo(disstid = 0) {
     g_tk: 5381,
     loginUin: 0,
     hostUin: 0,
-    format: 'json',
-    platform: 'yqq',
+    format: "json",
+    platform: "yqq",
     needNewCode: 0
-  })
+  });
   return await axios.get(url, {
     params: data
-  })
+  });
 }

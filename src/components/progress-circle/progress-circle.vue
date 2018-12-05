@@ -1,8 +1,8 @@
 <template>
   <div class="progress-circle">
     <svg
-      width="32"
-      height="32"
+      :width="radius"
+      :height="radius"
       viewBox="0 0 100 100"
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -13,14 +13,39 @@
         cx="50"
         cy="50"
         fill="transparent"
-        stroke-dasharray="314.1592653589793"
-        stroke-dashoffset="297.29172919176193"
+        :stroke-dasharray="dashArray"
+        :stroke-dashoffset="dashOffset"
         class="progress-bar"
       ></circle>
     </svg>
     <slot></slot>
   </div>
 </template>
+
+<script>
+  export default {
+    props: {
+      radius: {
+        type: Number | String,
+        default: 100
+      },
+      percent: {
+        type: Number,
+        default: 0
+      }
+    },
+    data() {
+      return {
+        dashArray: Math.PI * 100
+      }
+    },
+    computed: {
+      dashOffset() {
+        return (1 - this.percent) * this.dashArray
+      }
+    }
+  }
+</script>
 
 <style lang="scss" scoped>
 @import '@/common/scss/variable.scss';

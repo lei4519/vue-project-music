@@ -1,19 +1,27 @@
-import axios from 'axios'
-import {commonParams, options} from '@/api/config'
+import axios from "axios";
+import { commonParams, options } from "@/api/config";
+import { getLyric } from "@/api/song";
+import { Base64 } from "js-base64";
 
 export default class Song {
-  constructor({id, mid, singer, name, album, duration, image, url}) {
-    this.id = id
-    this.mid = mid
-    this.singer = singer
-    this.name = name
-    this.album = album
-    this.duration = duration
-    this.image = image
-    this.url = url
+  constructor({ id, mid, singer, name, album, duration, image, url }) {
+    this.id = id;
+    this.mid = mid;
+    this.singer = singer;
+    this.name = name;
+    this.album = album;
+    this.duration = duration;
+    this.image = image;
+    this.url = url;
+  }
+
+  async setLyric() {
+    if (this.lyric) return this.lyric;
+    let { data: ret } = await getLyric(this.mid);
+    this.lyric = Base64.decode(ret.lyric);
   }
 }
-function creataSong (musicData, url) {
+function creataSong(musicData) {
   return new Song({
     id: musicData.songid,
     mid: musicData.songmid,
@@ -21,68 +29,67 @@ function creataSong (musicData, url) {
     name: musicData.songname,
     album: musicData.albumname,
     duration: musicData.interval,
-    image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url
-  })
-}
-export async function creataSongs(musicList) {
-  const ret = []
-  const {domain, playUrlList} = await getUrl(musicList)
-  musicList.forEach((s, i) => {
-    ret.push(creataSong(s.musicData, `${domain}${playUrlList[i].purl}`))
-  })
-  return ret
+    image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${
+      musicData.albummid
+    }.jpg?max_age=2592000`
+  });
 }
 function filterSinger(singer) {
-  let ret = []
+  let ret = [];
   if (!singer) {
-    return ''
+    return "";
   }
-  singer.forEach(s => ret.push(s.name))
-  return ret.join('/')
+  singer.forEach(s => ret.push(s.name));
+  return ret.join("/");
+}
+export function* creataSongs(musicList) {
+  const ret = musicList.map(s => creataSong(s));
+  yield ret;
+  getUrl(musicList).then(({ domain, playUrlList }) => {
+    ret.forEach((s, i) => (s.url = `${domain}${playUrlList[i].purl}`));
+  });
 }
 async function getUrl(list) {
-  let songmids = []
-  let songtype = []
+  let songmids = [];
+  let songtype = [];
   list.forEach(s => {
-    let song = s.musicData
-    songmids.push(song.songmid)
-    songtype.push(song.type)
-  })
-  const {url_mid: res} = await getPlayUrl({songmids, songtype})
-  const domain = res.data.sip[0]
-  const playUrlList = res.data.midurlinfo
-  return {domain, playUrlList}
+    songmids.push(s.songmid);
+    songtype.push(s.type);
+  });
+  const { url_mid: res } = await getPlayUrl({ songmids, songtype });
+  const domain = res.data.sip[0];
+  const playUrlList = res.data.midurlinfo;
+  return { domain, playUrlList };
 }
 
-async function getPlayUrl({songmids, songtype}) {
-  const url = '/getPlayUrl'
+export async function getPlayUrl({ songmids, songtype = 0 }) {
+  const url = "/getPlayUrl";
   const urlData = {
-    'url_mid': {
-      'module': 'vkey.GetVkeyServer',
-      'method': 'CgiGetVkey',
-      'param': {
-        'guid': '9768452544',
-        'songmid': songmids,
-        'songtype': songtype,
-        'uin': '0',
-        'loginflag': 1,
-        'platform': '20'
+    url_mid: {
+      module: "vkey.GetVkeyServer",
+      method: "CgiGetVkey",
+      param: {
+        guid: "9768452544",
+        songmid: songmids,
+        songtype: songtype,
+        uin: "0",
+        loginflag: 1,
+        platform: "20"
       }
     },
-    'comm': {'uin': 0, 'format': 'json', 'ct': 20, 'cv': 0}
-  }
+    comm: { uin: 0, format: "json", ct: 20, cv: 0 }
+  };
   const data = Object.assign({}, commonParams, {
     g_tk: 5381,
     loginUin: 0,
     hostUin: 0,
-    platform: 'yqq',
-    format: 'json',
+    platform: "yqq",
+    format: "json",
     needNewCode: 0,
     data: JSON.stringify(urlData)
-  })
+  });
   const res = await axios.get(url, {
     params: data
-  })
-  return res.data
+  });
+  return res.data;
 }

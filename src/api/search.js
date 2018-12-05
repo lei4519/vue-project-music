@@ -13,24 +13,24 @@ export function getHotKey() {
   return jsonp(url, data, options)
 }
 
-export async function getSearchList(str, p=1) {
+export async function getSearchList(str, p = 1) {
   let url = '/getSearchList'
   const data = Object.assign({}, commonParams, {
-    platform:'h5',
-    needNewCode:1,
-    w:str,
-    zhidaqu:1,
-    catZhida:1,
-    t:0,
+    platform: 'h5',
+    needNewCode: 1,
+    w: str,
+    zhidaqu: 1,
+    catZhida: 1,
+    t: 0,
     format: 'json',
-    flag:1,
-    ie:'utf-8',
-    sem:1,
-    aggr:0,
-    perpage:20,
-    n:20,
-    p:p,
-    remoteplace:'txt.mqq.all'
+    flag: 1,
+    ie: 'utf-8',
+    sem: 1,
+    aggr: 0,
+    perpage: 20,
+    n: 20,
+    p: p,
+    remoteplace: 'txt.mqq.all'
   })
   return await axios.get(url, {
     params: data
