@@ -1,6 +1,6 @@
 <template>
-  <div class="rank">
-    <scroll :data="rankList" class="rank-content">
+  <div class="rank" ref="rank">
+    <scroll :data="rankList" ref="scroll" class="rank-content">
       <ul class="rank-list">
         <li class="item" v-for="(item, i) in rankList" :key="i" @click="selectRank(item)">
           <div class="avatar">
@@ -26,8 +26,9 @@ import { ERR_OK } from '@/api/config.js'
 import Scroll from '@/base/scroll/scroll.vue'
 import Loading from '@/base/loading/loading.vue'
 import { mapMutations } from 'vuex';
-
+import { playListMixin } from '@/common/js/mixin.js'
 export default {
+  mixins: [playListMixin],
   data: () => ({
     rankList: []
   }),
@@ -35,6 +36,11 @@ export default {
     this._getRankList()
   },
   methods: {
+    handelPlayList(playlist) {
+      let bottom = playlist.length ? '60px' : ''
+      this.$refs.rank.style.bottom = bottom
+      this.$refs.scroll.refresh()
+    },
     async _getRankList() {
       try {
         const res = await getRankList()

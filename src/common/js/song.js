@@ -14,7 +14,6 @@ export default class Song {
     this.image = image;
     this.url = url;
   }
-
   async setLyric() {
     if (this.lyric) return this.lyric;
     let { data: ret } = await getLyric(this.mid);
@@ -34,7 +33,15 @@ function creataSong(musicData) {
     }.jpg?max_age=2592000`
   });
 }
-function filterSinger(singer) {
+export function mixinSetLyric(song) {
+  song.setLyric = async () => {
+    if (song.lyric) return song.lyric;
+    let { data: ret } = await getLyric(song.mid);
+    song.lyric = Base64.decode(ret.lyric);
+  };
+  return song;
+}
+export function filterSinger(singer) {
   let ret = [];
   if (!singer) {
     return "";
@@ -48,6 +55,17 @@ export function* creataSongs(musicList) {
   getUrl(musicList).then(({ domain, playUrlList }) => {
     ret.forEach((s, i) => (s.url = `${domain}${playUrlList[i].purl}`));
   });
+}
+export async function anSong(song) {
+  const s = creataSong(song);
+  const { url_mid: res } = await getPlayUrl({
+    songmids: [song.songmid],
+    songtype: [song.type]
+  });
+  const domain = res.data.sip[0];
+  const playUrlList = res.data.midurlinfo[0];
+  s.url = `${domain}${playUrlList.purl}`;
+  return Promise.resolve(s);
 }
 async function getUrl(list) {
   let songmids = [];

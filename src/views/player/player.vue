@@ -92,10 +92,11 @@
           </progress-circle>
         </div>
         <div class="control">
-          <i class="icon-playlist"></i>
+          <i class="icon-playlist" @click.stop="showPlayList"></i>
         </div>
       </div>
     </transition>
+    <mini-play-list ref="playList"></mini-play-list>
     <audio
       ref="audio"
       :src="currentSong.url"
@@ -109,21 +110,22 @@
 
 <script>
 import { playMode } from "@/common/js/config";
-import playList from "@/components/play-list/play-list.vue";
+import miniPlayList from "@/components/play-list/play-list.vue";
 import Scroll from "@/base/scroll/scroll.vue";
 import progressBar from "@/components/progress-bar/progress-bar.vue";
 import progressCircle from "@/components/progress-circle/progress-circle.vue";
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters, mapMutations, mapActions } from "vuex";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "@/common/js/dom";
 import LyricParser from "lyric-parser";
+import { toggleModeMixin } from '@/common/js/mixin.js';
 
 const transform = prefixStyle("transform");
 const transitionDuration = prefixStyle("transitionDuration");
 export default {
+  mixins: [toggleModeMixin],
   created() {
     this.touch = {};
-    this.modeArr = Object.keys(playMode);
   },
   mounted() {
     this.cdWrapper = this.$refs.cdWrapper;
@@ -152,16 +154,6 @@ export default {
     disableCls() {
       return this.songReady ? "" : "disable";
     },
-    modeIcon() {
-      let iconName = "icon-sequence";
-      if (this.mode === playMode.loop) {
-        iconName = "icon-loop";
-      }
-      if (this.mode === playMode.random) {
-        iconName = "icon-random";
-      }
-      return iconName;
-    },
     ...mapGetters([
       "fullScreen",
       "playList",
@@ -172,6 +164,9 @@ export default {
     ])
   },
   methods: {
+    showPlayList() {
+      this.$refs.playList.showPlayList()
+    },
     touchstart(e) {
       this.touch.initiated = true;
       const touch = e.touches[0];
@@ -376,11 +371,6 @@ export default {
         this.togglePlaying();
       }
     },
-    togglePlayMode() {
-      let i = this.mode;
-      i = i + 1 >= this.modeArr.length ? 0 : i + 1;
-      this.setPlayMode(playMode[this.modeArr[i]]);
-    },
     async getLyric() {
       await this.currentSong.setLyric();
       this.currentLyric = new LyricParser(this.currentSong.lyric);
@@ -389,12 +379,16 @@ export default {
       setFullScreen: "SET_FULL_SCREEN",
       setPlayState: "SET_PLAYING_STATE",
       setCurrentIndex: "SET_CURRENT_INDEX",
-      setPlayMode: "SET_PLAY_MODE",
       setSongLyric: "SET_CURRENT_SONG_LYRIC"
-    })
+    }),
+    ...mapActions(['savePlayHistory'])
   },
   watch: {
     currentSong(newSong, oldSong) {
+      if (!newSong.id) {
+        return
+      }
+      this.savePlayHistory(newSong)
       if (newSong.id === oldSong.id) {
         return;
       }
@@ -413,10 +407,10 @@ export default {
     }
   },
   components: {
-    playList,
+    miniPlayList,
     Scroll,
     progressBar,
-    progressCircle
+    progressCircle,
   },
   filters: {
     formatTime(val) {

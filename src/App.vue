@@ -1,13 +1,13 @@
 <template>
   <div class="app" @click.once="iosTiggerPlayer">
-    <m-header></m-header>
-    <tab></tab>
+    <header class="header">
+      <m-header></m-header>
+      <tab></tab>
+    </header>
     <transition>
-      <keep-alive>
-        <router-view></router-view>
-      </keep-alive>
+      <keep-alive> <router-view></router-view> </keep-alive>
     </transition>
-    <player/>
+    <player />
   </div>
 </template>
 
@@ -29,3 +29,12 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+}
+</style>

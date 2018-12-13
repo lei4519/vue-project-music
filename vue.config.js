@@ -61,9 +61,7 @@ module.exports = {
         .get("/getPlayUrl", (req, res) => {
           const url = "https://u.y.qq.com/cgi-bin/musicu.fcg";
           axios
-            .get(url, {
-              params: req.query
-            })
+            .get(url, { params: req.query })
             .then(response => {
               res.json(response.data);
             })

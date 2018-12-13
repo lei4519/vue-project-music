@@ -12,14 +12,14 @@ import { creataSongs } from '@/common/js/song.js'
 import musicList from '@/components/music-list/music-list.vue'
 
 export default {
-  async created() {
+  created() {
     if (!this.rank.id) {
       return this.$router.back()
     }
-    this.getRankInfo(this.rank.id)
+    this._getRankInfo(this.rank.id)
   },
   methods: {
-    async getRankInfo(id) {
+    async _getRankInfo(id) {
       let res = await getRankInfo(id)
       if (res.code === ERR_OK) {
         const arr = res.songlist.map(s => s.data)
@@ -41,7 +41,7 @@ export default {
       return this.rank.topTitle
     },
     bgImg() {
-      return this.rank.picUrl
+      return this.songs[0] ? this.songs[0].image : ''
     },
     ...mapGetters([
       'rank'

@@ -3,7 +3,7 @@
     <ul>
       <li class="music-item" v-for="(song, i) in songs" :key="i" @click="selectItem(song, i)">
         <div class="rank" v-if="isRank">
-          <span :class="getClass(i)">{{i > 2 ? i+1 : ''}}</span>
+          <span :class="getRankCls(i)">{{getRankText(i)}}</span>
         </div>
         <div class="content">
           <h2 class="music-title">{{song.name}}</h2>
@@ -49,7 +49,10 @@ export default {
       const playUrlList = res.data.midurlinfo;
       song.url = `${domain}${playUrlList[i].purl}`
     },
-    getClass(num) {
+    getRankText(num) {
+      return num > 2 ? num + 1 : ''
+    },
+    getRankCls(num) {
       return classList[num] || classList['other']
     }
   }
