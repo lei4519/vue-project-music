@@ -1,51 +1,58 @@
 <template>
-  <div class="switches">
-    <div class="switch-item" @click="selectLeft" :class="{'active': active === 'left'}">
-      <span>最近播放</span>
-    </div>
-    <div class="switch-item" @click="selectRight" :class="{'active': active === 'right'}">
-      <span>搜索历史</span>
-    </div>
-  </div>
+    <ul class="switches">
+        <li v-for="(title, i) in switches"
+            :key="i"
+            class="switch-item"
+            @click="switchItem(i)"
+            :class="{'active': currentIndex === i}">
+            <span>{{title}}</span>
+        </li>
+
+    </ul>
 </template>
 
 <script>
-export default {
-  data: () => ({
-    active: 'left'
-  }),
-  methods: {
-    selectLeft() {
-      this.active = 'left'
-      this.$emit('selectLeft')
+  export default {
+    props: {
+      switches: {
+        type: Array,
+        default: []
+      },
+      currentIndex: {
+        type: Number,
+        default: 0
+      }
     },
-    selectRight() {
-      this.active = 'right'
-      this.$emit('selectRight')
-    },
+    methods: {
+      switchItem(index) {
+        this.$emit('switchItem', index)
+      }
+    }
   }
-}
 </script>
 
 <style lang="scss" scoped>
-@import "@/common/scss/variable.scss";
-.switches {
-  display: flex;
-  align-items: center;
-  width: 240px;
-  margin: 0 auto;
-  border: 1px solid #333;
-  border-radius: 5px;
-  .switch-item {
-    flex: 1;
-    padding: 8px;
-    text-align: center;
-    font-size: $font-size-medium;
-    color: $color-text-d;
-    &.active {
-      color: #fff;
-      background-color: $color-highlight-background;
+    @import "@/common/scss/variable.scss";
+
+    .switches {
+        display: flex;
+        align-items: center;
+        width: 240px;
+        margin: 0 auto;
+        border: 1px solid #333;
+        border-radius: 5px;
+
+        .switch-item {
+            flex: 1;
+            padding: 8px;
+            text-align: center;
+            font-size: $font-size-medium;
+            color: $color-text-d;
+
+            &.active {
+                color: #fff;
+                background-color: $color-highlight-background;
+            }
+        }
     }
-  }
-}
 </style>

@@ -1,11 +1,12 @@
 import * as types from "./mutations-types";
 import { playMode } from "@/common/js/config";
-import { mixinSetLyric } from "@/common/js/song.js";
 import {
   saveSearch,
   deleteSearch,
   clearSearch,
-  savePlay
+  savePlay,
+  saveFavorite,
+  deleteFavorite
 } from "@/common/js/cache";
 export const selectPlay = function({ commit }, { list, index }) {
   commit(types.SET_PLAYLIST, list);
@@ -82,7 +83,14 @@ export const clearPlayList = function({ commit }) {
   commit(types.SET_FULL_SCREEN, false);
 };
 
-export const savePlayHistory = function({ commit }, query) {
-  let song = mixinSetLyric(savePlay(query));
-  commit(types.SET_PLAY_HISTORY, song);
+export const savePlayHistory = function({ commit }, song) {
+  commit(types.SET_PLAY_HISTORY, savePlay(song));
+};
+
+export const saveFavoriteList = function({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, saveFavorite(song));
+};
+
+export const delFavoriteList = function({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, deleteFavorite(song));
 };

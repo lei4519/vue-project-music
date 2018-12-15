@@ -50,6 +50,10 @@ export default new Router({
           component: () => import("@/views/singer-detail/singer-detail.vue")
         }
       ]
+    },
+    {
+      path: '/user',
+      component: () => import("@/views/user/user.vue")
     }
   ]
 });

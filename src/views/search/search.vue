@@ -31,9 +31,10 @@
       </scroll>
     </div>
     <div class="search-result" v-show="query">
-      <suggest @select="saveSearch" :query="query"></suggest>
+      <suggest @select="saveSearch" @selectSinger="selectSinger" :query="query"></suggest>
     </div>
     <confirm ref="confirm" title="是否清空搜索历史" confirmBtnText="清空" @consent="clearSearchHistory"></confirm>
+     <router-view></router-view>
   </div>
 </template>
 <script>
@@ -44,8 +45,10 @@ import searchList from '@/components/search-list/search-list.vue';
 import { playListMixin, searchListMixin, suggestMixin } from '@/common/js/mixin.js';
 import { getHotKey } from "@/api/search.js";
 import { ERR_OK } from "@/api/config.js";
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 import confirm from '@/base/confirm/confirm.vue';
+import Singer from '@/common/js/singer.js'
+
 export default {
   mixins: [playListMixin, searchListMixin, suggestMixin],
   data() {
@@ -80,6 +83,16 @@ export default {
       this.$refs.shortcut.$el.style.bottom = bottom
       this.$refs.shortcut.refresh()
     },
+    selectSinger(item) {
+        const singer = new Singer({
+          id: item.singermid,
+          name: item.singername
+        })
+        this.setSinger(singer)
+        this.$router.push({
+          path: `/search/${singer.id}`
+        });
+    },
     async _getHotKey() {
       const res = await getHotKey();
       if (res.code === ERR_OK) {
@@ -89,7 +102,10 @@ export default {
     onQueryChange(val) {
       this.query = val;
     },
-    ...mapActions(['clearSearchHistory'])
+    ...mapActions(['clearSearchHistory']),
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   },
   components: {
     Scroll,

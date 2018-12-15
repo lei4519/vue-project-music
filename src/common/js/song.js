@@ -33,14 +33,7 @@ function creataSong(musicData) {
     }.jpg?max_age=2592000`
   });
 }
-export function mixinSetLyric(song) {
-  song.setLyric = async () => {
-    if (song.lyric) return song.lyric;
-    let { data: ret } = await getLyric(song.mid);
-    song.lyric = Base64.decode(ret.lyric);
-  };
-  return song;
-}
+
 export function filterSinger(singer) {
   let ret = [];
   if (!singer) {

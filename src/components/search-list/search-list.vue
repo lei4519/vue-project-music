@@ -1,12 +1,12 @@
 <template>
-  <ul class="search-list" v-show="searches.length">
-    <li class="item" v-for="(item, i) in searches" :key="i">
-      <span class="text" @click="select($event)">{{item}}</span>
-      <span class="delete" @click="deleteOne(item)">
+  <transition-group tag="ul" name="list" class="search-list" v-show="searches.length">
+      <li class="item" v-for="(item, i) in searches" :key="item">
+        <span class="text" @click="select($event)">{{item}}</span>
+        <span class="delete" @click="deleteOne(item)">
         <i class="icon-delete"></i>
       </span>
-    </li>
-  </ul>
+      </li>
+  </transition-group>
 </template>
 
 <script>
@@ -31,6 +31,15 @@ export default {
 
 <style lang="scss" scoped>
 @import "@/common/scss/variable.scss";
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.1s linear;
+}
+.list-enter,
+.list-leave-to {
+  height: 0;
+  transform: translateX(-100px);
+}
 .search-list {
   .item {
     display: flex;

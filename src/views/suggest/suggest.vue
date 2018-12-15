@@ -23,11 +23,8 @@
       </li>
     </ul>
     <div class="no-result-wrapper" v-show="noResult">
-      <div class="no-result-icon"></div>
-      <p class="no-result-text">抱歉，暂无搜索结果</p>
+      <no-result />
     </div>
-    <!-- TODO: 路由重复渲染问题未解决 -->
-    <!-- <router-view></router-view> -->
   </scroll>
 </template>
 
@@ -37,10 +34,9 @@ import Scroll from "@/base/scroll/scroll.vue";
 import { ERR_OK } from "@/api/config.js";
 import { getSearchList } from "@/api/search.js";
 import { anSong, filterSinger } from "@/common/js/song.js";
-import { mapActions, mapMutations } from 'vuex';
-import Singer from '@/common/js/singer.js'
+import { mapActions } from 'vuex';
 import { playListMixin } from '@/common/js/mixin.js';
-
+import noResult from '@/base/no-result/no-result.vue'
 const TYPE_SINGER = "singer";
 const perPage = 20
 export default {
@@ -79,14 +75,7 @@ export default {
     },
     selectItem(item) {
       if (item.type === TYPE_SINGER) {
-        const singer = new Singer({
-          id: item.singermid,
-          name: item.singername
-        })
-        this.setSinger(singer)
-        this.$router.push({
-          path: `/search/${singer.id}`
-        });
+        this.$emit('selectSinger', item)
       } else {
         anSong(item).then(song => {
           this.insertSong(song)
@@ -127,7 +116,7 @@ export default {
     },
     _genResult(data) {
       let ret = [];
-      if (data.zhida && data.zhida.singerid) {
+      if (data.zhida && data.zhida.singerid && !this.searchList[0]) {
         ret.push({ ...data.zhida, ...{ type: TYPE_SINGER } });
       }
       if (data.song) {
@@ -148,14 +137,12 @@ export default {
         return `${item.songname}-${filterSinger(item.singer)}`;
       }
     },
-    ...mapActions(['insertSong']),
-    ...mapMutations({
-      setSinger: 'SET_SINGER'
-    })
+    ...mapActions(['insertSong'])
   },
   components: {
     Loading,
-    Scroll
+    Scroll,
+    noResult
   }
 };
 </script>
@@ -172,18 +159,6 @@ export default {
     transform: translateY(-50%);
     width: 100%;
     text-align: center;
-    .no-result-icon {
-      width: 86px;
-      height: 90px;
-      margin: 0 auto;
-      @include bg-image("no-result");
-      background-size: 86px 90px;
-    }
-    .no-result-text {
-      margin-top: 30px;
-      font-size: 14px;
-      color: $color-text-d;
-    }
   }
   .suggest-list {
     padding: 0 30px;
