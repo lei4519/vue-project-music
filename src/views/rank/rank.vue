@@ -61,7 +61,6 @@ export default {
       setRank: 'SET_RANK'
     })
   },
-
   components: {
     Scroll,
     Loading

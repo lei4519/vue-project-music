@@ -1,5 +1,3 @@
-import { resolve } from "path";
-
 export function addClass(el, className) {
   if (hasClass(el, className)) {
     return false
