@@ -1,31 +1,33 @@
 <template>
-  <scroll
-    ref="search"
-    class="suggest"
-    v-show="query"
-    :data="searchList"
-    :pullUpLoad="pullUpLoad"
-    @pullingUp="pullingUp"
-  >
-    <ul class="suggest-list" v-show="query">
-      <li class="item" v-for="(item, i) in searchList" :key="i" @click="selectItem(item);">
-        <div class="icon">
-          <i :class="getIconCls(item)"></i>
-        </div>
-        <div class="name">
-          <p class="text" v-html="getDisPlayName(item)"></p>
-        </div>
-      </li>
-      <li v-if="isMore">
-        <div class="search-loading">
-          <loading :title="''"></loading>
-        </div>
-      </li>
-    </ul>
-    <div class="no-result-wrapper" v-show="noResult">
-      <no-result />
-    </div>
-  </scroll>
+  <div ref="searchResult">
+    <scroll
+      ref="search"
+      class="suggest"
+      v-show="query"
+      :data="searchList"
+      :pullUpLoad="pullUpLoad"
+      @pullingUp="pullingUp"
+    >
+      <ul class="suggest-list" v-show="query">
+        <li class="item" v-for="(item, i) in searchList" :key="i" @click="selectItem(item);">
+          <div class="icon">
+            <i :class="getIconCls(item)"></i>
+          </div>
+          <div class="name">
+            <p class="text" v-html="getDisPlayName(item)"></p>
+          </div>
+        </li>
+        <li v-if="isMore">
+          <div class="search-loading">
+            <loading :title="''"></loading>
+          </div>
+        </li>
+      </ul>
+      <div class="no-result-wrapper" v-show="noResult">
+        <no-result/>
+      </div>
+    </scroll>
+  </div>
 </template>
 
 <script>
@@ -70,7 +72,7 @@ export default {
   methods: {
     handelPlayList(playList) {
       let bottom = playList.length ? '60px' : ''
-      this.$refs.search.$el.style.bottom = bottom
+      this.$refs.searchResult.style.bottom = bottom
       this.$refs.search.refresh()
     },
     selectItem(item) {

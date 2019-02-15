@@ -30,11 +30,15 @@
         </div>
       </scroll>
     </div>
-    <div class="search-result" v-show="query">
-      <suggest @select="saveSearch" @selectSinger="selectSinger" :query="query"></suggest>
-    </div>
+    <suggest
+      class="search-result"
+      v-show="query"
+      @select="saveSearch"
+      @selectSinger="selectSinger"
+      :query="query"
+    />
     <confirm ref="confirm" title="是否清空搜索历史" confirmBtnText="清空" @consent="clearSearchHistory"></confirm>
-     <router-view></router-view>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -84,14 +88,14 @@ export default {
       this.$refs.shortcut.refresh()
     },
     selectSinger(item) {
-        const singer = new Singer({
-          id: item.singermid,
-          name: item.singername
-        })
-        this.setSinger(singer)
-        this.$router.push({
-          path: `/search/${singer.id}`
-        });
+      const singer = new Singer({
+        id: item.singermid,
+        name: item.singername
+      })
+      this.setSinger(singer)
+      this.$router.push({
+        path: `/search/${singer.id}`
+      });
     },
     async _getHotKey() {
       const res = await getHotKey();

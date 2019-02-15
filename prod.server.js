@@ -1,7 +1,9 @@
 const express = require('express')
-const axios = require("axios");
+const axios = require("axios")
+var history = require('connect-history-api-fallback')
 const app = express()
 
+app.use(history())
 const appRoutes = express.Router()
 appRoutes
   .get('/getDiscList', (req, res) => {
@@ -98,10 +100,12 @@ appRoutes
 // 开启gzip压缩,如果你想关闭gzip,注释掉下面两行代码，重新执行`node server.js`
 var compression = require('compression')
 app.use(compression())
-app.use('/', appRoutes)
-app.use(express.static('./dist'))
+app.use(express.static('./dist', {
+  maxAge: 2592000000
+}))
+app.use(appRoutes)
 
-module.exports = app.listen(3000, (err) => {
+app.listen(3000, (err) => {
   if (err) console.log(err)
   console.log('Listening at http://localhost:3000')
 })
