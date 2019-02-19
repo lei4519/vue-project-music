@@ -1,10 +1,11 @@
 # vue-music
 
 ```
-// 运行
-npm i
+//运行
+git clone git@github.com:lei4519/vue-project-music.git
 npm start
-// 之后访问http://localhost:3000 即可
+
+// 之后通过http://localhost:3000 或本机IP:3000 即可访问
 ```
 
 ## 项目介绍

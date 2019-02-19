@@ -1,0 +1,6 @@
+{
+  "name": "music",
+  "short_name": "音乐",
+  "start_url": "/",
+  "display": "fullscreen"
+}
